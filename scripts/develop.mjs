@@ -64,6 +64,10 @@ if (task === 'build') {
   const configurations = externalClientBundle(manifest.name, ['src/index.ts'], { packageRoot: root, clientEntry: 'src/client/index.tsx' })
   configurations[1].sourcemap = false
   for (const configuration of configurations) await build({ ...configuration, config: false })
+  // Bundler region comments name absolute source paths; keep this machine out of the package.
+  const client = join(root, 'lib/client.js')
+  const bundled = await readFile(client, 'utf8')
+  await writeFile(client, bundled.replaceAll(`${root}/`, ''))
 }
 await mkdir(join(root, '.local'), { recursive: true })
 await writeFile(join(root, '.local/harness.json'), JSON.stringify({ task, harness, harnessVersion: target.version, pluginVersion: manifest.version, checkedAt: new Date().toISOString() }, null, 2) + '\n')

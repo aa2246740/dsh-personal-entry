@@ -1,53 +1,72 @@
 import { Component, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
-import type { PersonalFeature, PersonalRegistry } from './registry.ts'
+import { useCopy, type PersonalCopy } from './copy.ts'
+import { FeatureIcon, PanelIcon, PersonalIcon } from './icons.tsx'
+import { cx, IconButton } from './navigation.tsx'
+import { isDarwinDesktop, type PersonalShell, type PersonalShellProps } from './shell.ts'
 import css from './personal.module.css'
-import { MenuIcon } from './navigation.tsx'
 
-function Arrow({ back = false }: { back?: boolean }) {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={back ? { transform: 'rotate(180deg)' } : undefined}><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-}
-
-/** A failed feature cannot remove the directory or the Work return control. */
-class FeatureBoundary extends Component<{ children: ReactNode; title: string }, { failed: boolean }> {
+/** A failed feature keeps the header, the sidebar and every other feature usable. */
+class FeatureBoundary extends Component<{ children: ReactNode; title: string; copy: PersonalCopy }, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() { return { failed: true } }
   render() {
-    return this.state.failed ? <div className={css.failure} role="alert"><h2>{this.props.title} 暂时无法显示</h2><p>可以重试，或从上方回到个人首页。</p><button onClick={() => this.setState({ failed: false })}>重新打开</button></div> : this.props.children
+    const { copy, title } = this.props
+    if (!this.state.failed) return this.props.children
+    return <div className={css.notice} role="alert">
+      <h2>{copy.failedTitle(title)}</h2>
+      <p>{copy.failedBody}</p>
+      <button type="button" className={css.pill} onClick={() => this.setState({ failed: false })}>{copy.retry}</button>
+    </div>
   }
 }
 
-function FeatureCard({ feature, onOpen }: { feature: PersonalFeature; onOpen: () => void }) {
-  const Icon = feature.icon
-  return <button className={css.card} onClick={onOpen} aria-label={`打开 ${feature.title}`} data-ud-check="feature-card">
-    <span className={css.cardTop}><span className={css.featureIcon}><Icon size={32}/></span><Arrow/></span>
-    <span className={css.cardTitle}>{feature.title}</span><span className={css.cardDescription}>{feature.description}</span>
-    <span className={css.cardDetail}>{feature.detail}</span>
-  </button>
+function Empty({ shell, copy }: { shell: PersonalShell; copy: PersonalCopy }) {
+  return <div className={css.notice}>
+    <span className={css.noticeMark}><PersonalIcon size={22}/></span>
+    <h2>{copy.emptyTitle}</h2>
+    <p>{copy.emptyBody}</p>
+    {shell.canOpenPlugins() && <button type="button" className={css.pill} onClick={shell.openPlugins}>{copy.openPlugins}</button>}
+  </div>
 }
 
-/** Directory and feature navigation inside the official main panel. */
-export function PersonalPage({ registry, toggleSidebar }: { registry: PersonalRegistry; toggleSidebar: () => void }) {
+/** Personal main panel: a title row aligned with the Conversation header, then the selected feature. */
+export function PersonalPage({ shell }: PersonalShellProps) {
+  const { registry } = shell
+  const copy = useCopy(shell.language)
   const features = useSyncExternalStore(registry.subscribe, registry.getSnapshot)
   const selected = useSyncExternalStore(registry.subscribe, registry.getSelection)
   const section = useSyncExternalStore(registry.subscribe, registry.getSelectedSection)
   useSyncExternalStore(registry.subscribe, registry.getNavigationKey)
-  const [visited, setVisited] = useState<Set<string>>(() => new Set(selected ? [selected] : []))
-  useEffect(() => { if (selected) setVisited(previous => new Set([...previous, selected])) }, [selected])
+  const sidebarHidden = useSyncExternalStore(shell.sidebarHidden.subscribe, shell.sidebarHidden.get)
+  // Opened features stay mounted while hidden, so switching back keeps their state.
+  const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set(selected ? [selected] : []))
+  useEffect(() => {
+    if (selected) setVisited(previous => previous.has(selected) ? previous : new Set([...previous, selected]))
+  }, [selected])
   const active = features.find(feature => feature.id === selected)
   const leaf = active?.sections?.find(item => item.id === section)
-  return <section className={`${css.theme} ${css.page}`} aria-label="个人空间">
-    <header className={css.header} data-ud-check="personal-header">
-      <div className={css.breadcrumb}><button className={css.menuButton} onClick={toggleSidebar} aria-label="切换个人菜单"><MenuIcon/></button><button onClick={() => registry.select(null)} aria-current={!active ? 'page' : undefined}>个人</button>{active && <><span className={css.divider}>/</span><span>{active.title}</span></>}{leaf && <><span className={css.divider}>/</span><span className={css.leafTitle}>{leaf.title}</span></>}</div>
+  return <section className={cx(css.theme, css.page)} aria-label={copy.space}>
+    <header className={css.header} data-window-drag data-ud-check="personal-header">
+      {sidebarHidden && !isDarwinDesktop() && <IconButton label={copy.openSidebar} onClick={shell.toggleSidebar}><PanelIcon size={16}/></IconButton>}
+      <h1 className={css.crumbs}>
+        {active
+          ? <>
+            <span className={leaf ? css.crumb : css.crumbCurrent}><span className={css.crumbGlyph}><FeatureIcon icon={active.icon} size={16}/></span>{active.title}</span>
+            {leaf && <><span className={css.crumbSep} aria-hidden="true">/</span><span className={css.crumbCurrent}>{leaf.title}</span></>}
+          </>
+          : <span className={css.crumbCurrent}>{copy.space}</span>}
+      </h1>
     </header>
-    {!active && <div className={css.home}>
-      <div className={css.intro} data-ud-check="personal-intro"><span className={css.eyebrow}>留一点空间，给自己</span><h1>生活里的想法，从这里开始。</h1><p>聊一聊，记下来，让零散的灵感慢慢成形。</p></div>
-      <div className={css.sectionLabel}>我的功能<span>{features.length.toString().padStart(2, '0')}</span></div>
-      <div className={css.grid}>{features.map(feature => <FeatureCard key={feature.id} feature={feature} onOpen={() => registry.select(feature.id)}/>)}</div>
-      {features.length === 0 && <p className={css.empty}>还没有添加功能。启用个人功能插件后，它会出现在这里。</p>}
-    </div>}
-    {features.filter(feature => visited.has(feature.id) || feature.id === selected).map(feature => {
-      const Page = feature.component
-      return <div key={feature.id} className={css.featurePage} hidden={selected !== feature.id}><FeatureBoundary title={feature.title}><Page section={registry.getSection(feature.id)} navigationKey={registry.getFeatureNavigationKey(feature.id)} onSectionChange={next => registry.setSection(feature.id, next)}/></FeatureBoundary></div>
-    })}
+    <div className={css.body}>
+      {!active && <Empty shell={shell} copy={copy}/>}
+      {features.filter(feature => visited.has(feature.id) || feature.id === selected).map(feature => {
+        const Page = feature.component
+        return <div key={feature.id} className={css.featurePage} hidden={feature.id !== selected}>
+          <FeatureBoundary title={feature.title} copy={copy}>
+            <Page section={registry.getSection(feature.id)} navigationKey={registry.getFeatureNavigationKey(feature.id)} onSectionChange={next => registry.setSection(feature.id, next)}/>
+          </FeatureBoundary>
+        </div>
+      })}
+    </div>
   </section>
 }
