@@ -1,0 +1,10 @@
+id: dsh-personal
+entry: src/index.ts
+marker: "[dsh-personal] loaded"
+kind: client
+profile: desktop
+hotReload:
+  artifacts:
+    - src/index.ts
+    - lib/index.js
+    - lib/client.js

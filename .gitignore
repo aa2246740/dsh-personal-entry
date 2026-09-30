@@ -1,0 +1,12 @@
+node_modules/
+lib/
+.local/
+output/
+coverage/
+*.tgz
+*.tsbuildinfo
+.env
+.env.*
+.DS_Store
+.dshx/
+LOCAL-DEVELOPMENT.md

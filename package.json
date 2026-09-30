@@ -1,0 +1,100 @@
+{
+  "name": "dsh-personal",
+  "version": "0.2.4",
+  "private": true,
+  "type": "module",
+  "description": "Extensible Personal workspace entry for DeepSeek Harness",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src",
+    "dshx.yml",
+    "README.md",
+    "cordis.patch.yml",
+    "docs"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.4",
+    "@deepseek-ai/dsh": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-layout": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-sidebar": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-locale": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-renderer": ">=0.2.0-rc.1 <0.2.1"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-slots": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-layout": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-sidebar": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-locale": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-renderer": {
+      "optional": true
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aa2246740/dsh-personal-entry.git"
+  },
+  "homepage": "https://github.com/aa2246740/dsh-personal-entry#readme",
+  "bugs": {
+    "url": "https://github.com/aa2246740/dsh-personal-entry/issues"
+  },
+  "engines": {
+    "node": ">=22.19"
+  },
+  "scripts": {
+    "prepare:host": "node scripts/develop.mjs prepare",
+    "build": "node scripts/develop.mjs build",
+    "typecheck": "node scripts/develop.mjs typecheck",
+    "test": "node scripts/develop.mjs test",
+    "test:registry": "node --test tests/registry.test.ts",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "~5.9.3"
+  }
+}
