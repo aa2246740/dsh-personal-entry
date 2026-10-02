@@ -29,9 +29,12 @@ export function createFlag(initial = false): Flag {
 export interface PersonalShell {
   readonly registry: PersonalRegistry
   readonly language: LanguageSource
-  /** True while the frame hides the sidebar column entirely (macOS/Windows collapse). */
+  readonly visible: Flag
+  readonly sidebarCollapsed: Flag
+  /** True while Personal hides its own sidebar column entirely. */
   readonly sidebarHidden: Flag
   toggleSidebar(): void
+  showPersonal(): void
   showWork(): void
   canOpenPlugins(): boolean
   openPlugins(): void

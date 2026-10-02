@@ -87,6 +87,7 @@
     "typecheck": "node scripts/develop.mjs typecheck",
     "test": "node scripts/develop.mjs test",
     "test:registry": "node --test tests/registry.test.ts",
+    "test:switch": "npm run build && node tests/switch-performance.mjs",
     "release:pack": "node scripts/release.mjs",
     "prepack": "npm run build"
   },

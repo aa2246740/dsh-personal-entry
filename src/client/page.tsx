@@ -1,4 +1,4 @@
-import { Component, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { Component, memo, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { useCopy, type PersonalCopy } from './copy.ts'
 import { FeatureIcon, PanelIcon, PersonalIcon } from './icons.tsx'
 import { cx, IconButton } from './navigation.tsx'
@@ -30,7 +30,7 @@ function Empty({ shell, copy }: { shell: PersonalShell; copy: PersonalCopy }) {
 }
 
 /** Personal main panel: a title row aligned with the Conversation header, then the selected feature. */
-export function PersonalPage({ shell }: PersonalShellProps) {
+export const PersonalPage = memo(function PersonalPage({ shell, portalContainer }: PersonalShellProps & { portalContainer?: HTMLElement }) {
   const { registry } = shell
   const copy = useCopy(shell.language)
   const features = useSyncExternalStore(registry.subscribe, registry.getSnapshot)
@@ -63,10 +63,10 @@ export function PersonalPage({ shell }: PersonalShellProps) {
         const Page = feature.component
         return <div key={feature.id} className={css.featurePage} hidden={feature.id !== selected}>
           <FeatureBoundary title={feature.title} copy={copy}>
-            <Page section={registry.getSection(feature.id)} navigationKey={registry.getFeatureNavigationKey(feature.id)} onSectionChange={next => registry.setSection(feature.id, next)}/>
+            <Page section={registry.getSection(feature.id)} navigationKey={registry.getFeatureNavigationKey(feature.id)} onSectionChange={next => registry.setSection(feature.id, next)} portalContainer={portalContainer}/>
           </FeatureBoundary>
         </div>
       })}
     </div>
   </section>
-}
+})

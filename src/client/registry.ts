@@ -16,6 +16,8 @@ export interface PersonalFeaturePageProps {
   section: string | null
   navigationKey: number
   onSectionChange: (section: string) => void
+  /** Put portaled menus/dialogs inside Personal's native modal, not document.body. */
+  portalContainer?: HTMLElement
 }
 
 /** A peer feature in Personal. The feature owns its page and durable data. */

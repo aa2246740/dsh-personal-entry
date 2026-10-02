@@ -31,7 +31,7 @@ export function registerSpaceShortcut(ctx: Context, label: () => string, run: ()
           aliases: ['personal', 'work', 'space', '个人', '工作'],
           defaults: {},
           regions: ['page', 'editable'],
-          modals: [],
+          modals: ['personal-space'],
           resolve: () => ({ status: 'handled', run }),
         })
       } catch (error) {

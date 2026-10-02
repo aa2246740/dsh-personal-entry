@@ -44,7 +44,7 @@ Use the existing small and medium theme radii. Keep the trigger and menu destina
 - Collapsed sidebar: retain the existing expand and return-to-work controls.
 
 ## Do's and Don'ts
-- Keep the label and person icon recognizable from the official entry.
+- Keep the label and person icon recognizable in the official footer action seat.
 - Do not introduce a segmented Work/Personal control after entering Personal.
 - Do not put interactive controls inside the official icon-only panel slot or rewrite official sidebar DOM.
 
@@ -63,7 +63,7 @@ The trigger names the current space. Menu labels name destinations. `工作` and
 Execution: single-agent; this is one localized interaction with shared implementation and acceptance ownership.
 Active: information architecture, accessibility/usability, responsive interaction.
 Support: principles/index, web-product, content-model, design-contract, visual-verification, quality-gates.
-Constraint: the official `sidebar.panellist` owns its button and allows only icon/label contributions. Work therefore retains its ordinary Personal entry. The plugin controls the dropdown inside Personal.
+Constraint: the official `sidebar.panellist` owns its button and always navigates the main panel. To preserve Work's mounted tree, Personal uses the public `sidebar.footer.action` button and an additive `shell.overlay` surface. The plugin controls the dropdown inside Personal.
 
 ## OKF Decision Bindings
 | Reference | Decision | Artifact target | Verification |
@@ -79,9 +79,11 @@ Clarity-first: one vertical layout family, existing system typography, no new pa
 Typecheck, unit tests, build, package inspection; rendered closed/open menu, keyboard/outside dismissal, current-item preservation, Work return and Personal re-entry. Native Desktop evidence is separate from component rendering and does not imply Windows/Linux acceptance.
 
 ## Assumptions and Open Questions
-Assumption: this change belongs to the installed Personal entry. A fully symmetric Work dropdown requires an official interactive space-switch slot, currently unavailable in the inspected Host.
+The performance fix moves Work's Personal action to the sidebar footer. Personal owns a 280px sidebar and collapse state inside its dialog; it does not read or replace private Work geometry. A native modal keeps keyboard focus inside the active space. The feature portal container is public so peer overlays can remain inside it.
 
 ## Review Log
+
+2026-10-03: switching no longer selects a keyed main panel or shadows the official sidebar. Work and opened Personal pages remain mounted. The footer action and persistent surface address repeated remount cost; see `docs/switch-performance.md` for measured fixture evidence and separate live-client checks. Existing 0.2.7 release notes below describe the old implementation.
 2026-09-30: contract created before implementation. Previous segmented control introduced a second navigation model; replace it with a current-space dropdown. Implemented in 0.2.7. Typecheck, 8 unit tests, build, dshx check and package inspection passed. Pinned Chromium component checks passed in Chinese and English at 320/375/768px: keyboard open/arrows/Home/End, Escape/focus restoration, Tab exit, current-space preservation, outside and iframe dismissal. Saved screenshots and results are in ignored `.local/menu-evidence/`; these use a minimal Host adapter and are component evidence only. Native macOS Desktop separately showed the closed/open menu and keyboard return to Work. The initial iframe-dismiss defect found in live use was repaired with window-blur dismissal. No new animation, model call or data mutation is part of this change. Windows/Linux and native dark mode are unverified. The generic HTML audit was not used against the native Electron app; native screenshots/AX and the pinned component geometry/occlusion checks provide separate evidence without a full HTML-audit claim.
 
 Final native acceptance: 0.2.7 installed and enabled through the official Desktop plugin UI; installed client bytes match the local build. Clicking the real OOPS composer closes the space menu, and reopening it shows Work / Personal with Personal checked. Host PID remained unchanged. Final critique: the segmented-navigation mismatch is removed; the Work entry remains an official panel shortcut under the documented API constraint. No unresolved high-impact findings in the changed menu.

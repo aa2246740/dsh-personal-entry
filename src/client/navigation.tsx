@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { memo, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { useCopy, type PersonalCopy } from './copy.ts'
 import { ChevronIcon, FeatureIcon, PanelIcon, PersonalIcon, WorkIcon } from './icons.tsx'
 import { loadCollapsed, saveCollapsed } from './memory.ts'
@@ -158,11 +158,10 @@ function Rail({ shell, copy, navigate }: { shell: PersonalShell; copy: PersonalC
 }
 
 /**
- * Personal sidebar, occupying the official `sidebar` slot only while Personal is selected.
- * It follows the official column states: wide, the Web 56px rail, or fully hidden
+ * Personal's own sidebar follows the column states: wide, the Web 56px rail, or fully hidden
  * (macOS and Windows), fading wide content out before the rail settles.
  */
-export function PersonalSidebar({ collapsed, width, shell }: PersonalShellProps & { collapsed: boolean; width: number }) {
+export const PersonalSidebar = memo(function PersonalSidebar({ collapsed, width, shell }: PersonalShellProps & { collapsed: boolean; width: number }) {
   const copy = useCopy(shell.language)
   const [settled, setSettled] = useState(collapsed)
   useEffect(() => {
@@ -191,7 +190,7 @@ export function PersonalSidebar({ collapsed, width, shell }: PersonalShellProps 
     </div>
     <FeatureTree shell={shell} copy={copy} navigate={navigate}/>
   </aside>
-}
+})
 
 /** macOS window-chrome seat beside the traffic lights while the sidebar is hidden. */
 export function PersonalLeading({ shell }: PersonalShellProps) {
@@ -202,7 +201,11 @@ export function PersonalLeading({ shell }: PersonalShellProps) {
   </div>
 }
 
-/** Official sidebar row glyph for entering Personal. */
-export function PersonalEntryIcon({ size = 16 }: { size?: number }) {
-  return <PersonalIcon size={size}/>
+/** An action seat owns its button; unlike panellist it does not navigate main. */
+export function PersonalEntry({ shell, wide }: PersonalShellProps & { wide: boolean }) {
+  const copy = useCopy(shell.language)
+  return <button type="button" className={cx(css.theme, css.entry)} aria-label={copy.space}
+    title={copy.space} onClick={shell.showPersonal}>
+    <PersonalIcon size={wide ? 16 : 18}/>{wide && <span>{copy.space}</span>}
+  </button>
 }

@@ -1,0 +1,23 @@
+{
+  "clientSha256": "3c1f78942e0afdffa0ed53dcd15e1d209a798cf0b7aaa6b435806b5e53d0ae15",
+  "rounds": [
+    {
+      "round": 1,
+      "pptDraft": "Personal 切换验收草稿（不发送）",
+      "page2": true,
+      "workDraft": "Personal 切换工作草稿（不发送）"
+    },
+    {
+      "round": 2,
+      "pptDraft": "Personal 切换验收草稿（不发送）",
+      "page2": true,
+      "workDraft": "Personal 切换工作草稿（不发送）"
+    },
+    {
+      "round": 3,
+      "pptDraft": "Personal 切换验收草稿（不发送）",
+      "page2": true,
+      "workDraft": "Personal 切换工作草稿（不发送）"
+    }
+  ]
+}

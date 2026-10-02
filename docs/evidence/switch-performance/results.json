@@ -1,0 +1,104 @@
+[
+  {
+    "name": "before",
+    "sha256": "22d1aa1a40bb5d0a028d7448eddae50e4579dde3974118db730acf1062bc4d01",
+    "fixtureOnly": true,
+    "cycles": 22,
+    "metrics": {
+      "sidebarMounts": 23,
+      "sidebarUnmounts": 22,
+      "workMounts": 23,
+      "workUnmounts": 22,
+      "featureMounts": 22,
+      "featureUnmounts": 22,
+      "iframeLoads": 22,
+      "panelWrites": 44,
+      "slotWrites": 90
+    },
+    "state": {
+      "workDraft": "",
+      "workScroll": 0,
+      "personalDraft": "",
+      "framePage": "Page 1"
+    },
+    "frameReadyMs": {
+      "median": 17.40000009536743,
+      "p95": 21.199999809265137,
+      "samples": [
+        19.299999713897705,
+        17,
+        18.59999990463257,
+        17.899999618530273,
+        17.40000009536743,
+        25.09999990463257,
+        16.699999809265137,
+        16.09999990463257,
+        16.100000381469727,
+        17.5,
+        17,
+        16.200000286102295,
+        15.400000095367432,
+        18,
+        16.90000009536743,
+        16.300000190734863,
+        21.199999809265137,
+        15,
+        19.5,
+        19
+      ]
+    },
+    "errors": [],
+    "networkRequests": []
+  },
+  {
+    "name": "after",
+    "sha256": "3c1f78942e0afdffa0ed53dcd15e1d209a798cf0b7aaa6b435806b5e53d0ae15",
+    "fixtureOnly": true,
+    "cycles": 22,
+    "metrics": {
+      "sidebarMounts": 1,
+      "sidebarUnmounts": 0,
+      "workMounts": 1,
+      "workUnmounts": 0,
+      "featureMounts": 1,
+      "featureUnmounts": 0,
+      "iframeLoads": 1,
+      "panelWrites": 0,
+      "slotWrites": 2
+    },
+    "state": {
+      "workDraft": "Work draft must survive",
+      "workScroll": 750,
+      "personalDraft": "Unsaved PPT draft",
+      "framePage": "Page 2"
+    },
+    "frameReadyMs": {
+      "median": 9.400000095367432,
+      "p95": 15.599999904632568,
+      "samples": [
+        4.900000095367432,
+        9.400000095367432,
+        4.400000095367432,
+        9.200000286102295,
+        12.5,
+        4.599999904632568,
+        15.900000095367432,
+        9.099999904632568,
+        7.300000190734863,
+        4.5,
+        8,
+        4.300000190734863,
+        3.9000000953674316,
+        15.599999904632568,
+        14.299999713897705,
+        14.099999904632568,
+        14.299999713897705,
+        13.100000381469727,
+        10.300000190734863,
+        10.099999904632568
+      ]
+    },
+    "errors": [],
+    "networkRequests": []
+  }
+]
