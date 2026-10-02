@@ -70,14 +70,19 @@ export class PersonalRegistry {
   private readonly sections = new Map<string, string>()
   private readonly versions = new Map<string, number>()
   private readonly memory: PersonalMemory | undefined
+  private readonly suspendSurface: () => (restore?: boolean) => void
 
-  constructor(memory?: PersonalMemory) {
+  constructor(memory?: PersonalMemory, suspendSurface: () => (restore?: boolean) => void = () => () => {}) {
     this.memory = memory
+    this.suspendSurface = suspendSurface
     const saved = memory?.load()
     if (!saved) return
     this.preferred = saved.feature
     for (const [feature, section] of Object.entries(saved.sections)) this.sections.set(feature, section)
   }
+
+  /** Hide Personal for a Host-owned dialog. Resume preserves every feature page. */
+  suspend = (): ((restore?: boolean) => void) => this.suspendSurface()
 
   /** Current ordered features; stable until the registry changes. */
   getSnapshot = (): readonly PersonalFeature[] => this.rows

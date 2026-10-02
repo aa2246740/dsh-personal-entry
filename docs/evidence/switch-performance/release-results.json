@@ -1,0 +1,53 @@
+[
+  {
+    "name": "after",
+    "sha256": "f81e9d06b7dc7d4c4ded713c482bf4fdf83298734e4547408e18f384cb2eae06",
+    "fixtureOnly": true,
+    "cycles": 22,
+    "metrics": {
+      "sidebarMounts": 1,
+      "sidebarUnmounts": 0,
+      "workMounts": 1,
+      "workUnmounts": 0,
+      "featureMounts": 1,
+      "featureUnmounts": 0,
+      "iframeLoads": 1,
+      "panelWrites": 0,
+      "slotWrites": 2
+    },
+    "state": {
+      "workDraft": "Work draft must survive",
+      "workScroll": 750,
+      "personalDraft": "Unsaved PPT draft",
+      "framePage": "Page 2"
+    },
+    "frameReadyMs": {
+      "median": 12.399999618530273,
+      "p95": 14.400000095367432,
+      "samples": [
+        11,
+        13.400000095367432,
+        12.399999618530273,
+        14.099999904632568,
+        6.5,
+        15.5,
+        7,
+        13.800000190734863,
+        13.900000095367432,
+        14.400000095367432,
+        4.300000190734863,
+        7.799999713897705,
+        13.5,
+        9.099999904632568,
+        7.400000095367432,
+        13.799999713897705,
+        13.299999713897705,
+        12,
+        6.200000286102295,
+        7.200000286102295
+      ]
+    },
+    "errors": [],
+    "networkRequests": []
+  }
+]

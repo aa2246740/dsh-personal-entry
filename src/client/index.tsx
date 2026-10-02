@@ -28,7 +28,20 @@ const PLUGINS = 'plugins' as MainPanelId
  * navigation never elects another main panel or replaces the official sidebar.
  */
 export function apply(ctx: Context): void {
-  const registry = new PersonalRegistry(browserMemory)
+  const visible = createFlag()
+  const registry = new PersonalRegistry(browserMemory, () => {
+    const wasOpen = visible.get()
+    visible.set(false)
+    let changed = false
+    let resumed = false
+    const off = visible.subscribe(() => { changed = true })
+    return (restore = true) => {
+      if (resumed) return
+      resumed = true
+      off()
+      if (restore && wasOpen && !changed) visible.set(true)
+    }
+  })
   const language: LanguageSource = {
     get: () => { try { return ctx.locale.getLocale().active } catch { return undefined } },
     subscribe: listener => { try { return ctx.locale.subscribe(listener) } catch { return () => {} } },
@@ -36,7 +49,6 @@ export function apply(ctx: Context): void {
   const hasPanel = (id: MainPanelId) => {
     try { return ctx.slots.entriesOfSlot('main').some(entry => entry.options.key === id) } catch { return false }
   }
-  const visible = createFlag()
   const sidebarCollapsed = createFlag()
   const showWork = () => visible.set(false)
   const shell: PersonalShell = {

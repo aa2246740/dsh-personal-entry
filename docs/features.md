@@ -59,8 +59,12 @@ export function apply(ctx: Context): void {
 
 - 排在最前的功能是个人空间的默认页面。想做「总览」这类首页时，用最小的 `order` 注册一个无子页面的功能即可。
 - 用户明确打开过的功能和各功能的子页面会记在本机。该功能暂未注册（加载中或热重载）时先显示第一个功能，注册后自动回到它；已不存在的子页面回退到第一个。
-- 页面接收 `section`、`navigationKey`、`onSectionChange`。性能修复分支还提供可选的 `portalContainer`，用于 `createPortal(content, portalContainer)` 或浮层库的 `container` 参数。个人空间位于原生 dialog 中，同文档浮层应挂到这个容器或功能自己的 DOM 内；直接挂到 `document.body` 会落到 dialog 后面。iframe 内部的浮层不受影响。内部路由变化调用 `onSectionChange` 同步侧栏高亮；用户重复点同一子页面时 `navigationKey` 仍会增加，页面可据此回到该子页面的根视图。不要在自家页面后台切换时抢占其他功能的选择。
+- 页面接收 `section`、`navigationKey`、`onSectionChange`。0.2.8 起还提供可选的 `portalContainer`，用于 `createPortal(content, portalContainer)` 或浮层库的 `container` 参数。个人空间位于原生 dialog 中，同文档浮层应挂到这个容器或功能自己的 DOM 内；直接挂到 `document.body` 会落到 dialog 后面。iframe 内部的浮层不受影响。内部路由变化调用 `onSectionChange` 同步侧栏高亮；用户重复点同一子页面时 `navigationKey` 仍会增加，页面可据此回到该子页面的根视图。不要在自家页面后台切换时抢占其他功能的选择。
 - `ctx.personal.select(id, section?)` 打开指定功能；`select(null)` 回到默认功能（0.2.4 及以前表示打开总览目录，目录已移除）。`getSelection()` 返回当前显示的功能，没有功能时为 `null`。
 - 已打开过的功能在个人面板内保持挂载，回到工作时也只隐藏，重新进入会保留页面状态。后台业务与资源占用由功能自己负责，移除注册会正常卸载组件。页面标题栏属于总壳，功能页面不需要再处理 macOS 红绿灯和窗口拖动。
 - 页面或图标抛错只影响该功能自身。注册的移除函数可重复调用，但不允许重复 id 覆盖已有功能。无需修改 Personal 源码或 OOPS 即可增加、移除并列功能。
 - 功能的业务数据、路由和持久化由功能插件自己负责。
+
+## 打开宿主设置等全局界面
+
+Personal 0.2.8 的 `ctx.personal.suspend()` 暂时隐藏个人空间，并返回幂等的恢复函数。功能打开宿主设置前先调用它，设置关闭后调用恢复函数（取消恢复时传 `false`）；页面和 iframe 始终保留。若用户期间主动切换空间，恢复函数不会覆盖其选择。旧版本没有此接口，兼容消费者应按需探测。

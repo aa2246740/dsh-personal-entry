@@ -49,7 +49,7 @@ function App(){React.useSyncExternalStore(subscribe,()=>version);const sidebar=s
 plugin.apply(ctx);
 const removeFeature=registry.register({id:'slides',title:'Slides',order:1,icon:()=>null,component:Feature});
 ReactDOM.createRoot(document.getElementById('root')).render(h(App));
-window.test={metrics,get panel(){return snapshot.activePanelId},get command(){return command},unload:()=>{effects.reverse().forEach(fn=>fn());notify()},removeFeature,readdFeature:()=>registry.register({id:'slides',title:'Slides',order:1,icon:()=>null,component:Feature})};
+window.test={metrics,get registry(){return registry},get panel(){return snapshot.activePanelId},get command(){return command},unload:()=>{effects.reverse().forEach(fn=>fn());notify()},removeFeature,readdFeature:()=>registry.register({id:'slides',title:'Slides',order:1,icon:()=>null,component:Feature})};
 window.settle=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
 </script></html>`
     const fixture = resolve(output, `${name}.html`)
@@ -100,6 +100,13 @@ window.settle=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimatio
         featureMounts: 1, featureUnmounts: 0, iframeLoads: 1, panelWrites: 0, slotWrites: 2 })
       // Native modal focus containment, menu dismissal and collapsed return.
       await enter()
+      await page.evaluate(async () => { window.resumePersonal = window.test.registry.suspend(); await window.settle() })
+      assert.equal(await page.getByRole('dialog').count(), 0)
+      assert.equal(await page.getByRole('textbox', { name: 'Work draft' }).isVisible(), true)
+      await page.evaluate(async () => { window.resumePersonal(); window.resumePersonal(); await window.settle() })
+      assert.equal(await page.getByRole('dialog').count(), 1)
+      assert.equal(await frame.getByRole('textbox', { name: 'Slide draft' }).inputValue(), 'Unsaved PPT draft')
+      assert.equal(await page.evaluate(() => window.test.metrics.iframeLoads), 1)
       await page.getByRole('button', { name: 'Feature menu' }).click()
       assert.equal(await page.evaluate(() => window.portalClicks), 1)
       assert.equal(await page.locator('#portal-probe').evaluate(el => !!el.closest('dialog')), true)
