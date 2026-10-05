@@ -71,10 +71,12 @@ export class PersonalRegistry {
   private readonly versions = new Map<string, number>()
   private readonly memory: PersonalMemory | undefined
   private readonly suspendSurface: () => (restore?: boolean) => void
+  private readonly showSurface: () => void
 
-  constructor(memory?: PersonalMemory, suspendSurface: () => (restore?: boolean) => void = () => () => {}) {
+  constructor(memory?: PersonalMemory, suspendSurface: () => (restore?: boolean) => void = () => () => {}, showSurface: () => void = () => {}) {
     this.memory = memory
     this.suspendSurface = suspendSurface
+    this.showSurface = showSurface
     const saved = memory?.load()
     if (!saved) return
     this.preferred = saved.feature
@@ -83,6 +85,14 @@ export class PersonalRegistry {
 
   /** Hide Personal for a Host-owned dialog. Resume preserves every feature page. */
   suspend = (): ((restore?: boolean) => void) => this.suspendSurface()
+
+  /** Open a registered feature from a peer's Work entry without remounting it. */
+  open = (id: string, section?: string): boolean => {
+    if (!this.rows.some(row => row.id === id)) return false
+    this.select(id, section)
+    this.showSurface()
+    return true
+  }
 
   /** Current ordered features; stable until the registry changes. */
   getSnapshot = (): readonly PersonalFeature[] => this.rows

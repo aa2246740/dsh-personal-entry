@@ -87,3 +87,11 @@ The performance fix moves Work's Personal action to the sidebar footer. Personal
 2026-09-30: contract created before implementation. Previous segmented control introduced a second navigation model; replace it with a current-space dropdown. Implemented in 0.2.7. Typecheck, 8 unit tests, build, dshx check and package inspection passed. Pinned Chromium component checks passed in Chinese and English at 320/375/768px: keyboard open/arrows/Home/End, Escape/focus restoration, Tab exit, current-space preservation, outside and iframe dismissal. Saved screenshots and results are in ignored `.local/menu-evidence/`; these use a minimal Host adapter and are component evidence only. Native macOS Desktop separately showed the closed/open menu and keyboard return to Work. The initial iframe-dismiss defect found in live use was repaired with window-blur dismissal. No new animation, model call or data mutation is part of this change. Windows/Linux and native dark mode are unverified. The generic HTML audit was not used against the native Electron app; native screenshots/AX and the pinned component geometry/occlusion checks provide separate evidence without a full HTML-audit claim.
 
 Final native acceptance: 0.2.7 installed and enabled through the official Desktop plugin UI; installed client bytes match the local build. Clicking the real OOPS composer closes the space menu, and reopening it shows Work / Personal with Personal checked. Host PID remained unchanged. Final critique: the segmented-navigation mismatch is removed; the Work entry remains an official panel shortcut under the documented API constraint. No unresolved high-impact findings in the changed menu.
+
+## 2026-10-05 底部入口排版修复
+
+Request Anchor：Personal 与 Feishu 同时占用页脚时，「个人」被压成两行。保留原有主题与持久页面，不恢复会引起重建的 main 面板导航。
+
+决策：通过公开的 `data-slot="sidebar.footer.action"` 锚点把操作纵向排列，个人与飞书各占一行，图标不收缩、文字不换行。不依赖宿主私有类名或改动宿主 DOM。为功能插件增加 `open()` 导航接口，复用已有个人页面。
+
+验收：200/280/400px 侧栏和 56px 图标栏与全宽同级插件共存；22 轮切换无工作页面或 PPT iframe 重建；工作草稿、滚动和 PPT 草稿保留。另以真实桌面截图确认最终效果。

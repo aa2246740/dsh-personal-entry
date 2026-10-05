@@ -41,7 +41,7 @@ export function apply(ctx: Context): void {
       off()
       if (restore && wasOpen && !changed) visible.set(true)
     }
-  })
+  }, () => visible.set(true))
   const language: LanguageSource = {
     get: () => { try { return ctx.locale.getLocale().active } catch { return undefined } },
     subscribe: listener => { try { return ctx.locale.subscribe(listener) } catch { return () => {} } },

@@ -58,12 +58,24 @@
   background: var(--p-hover);
 }
 
+/* The public slot anchor groups footer actions. RC2's parent is a horizontal
+   flex row; stack the actions inside the documented anchor so a full-width
+   peer (e.g. Feishu) cannot compress Personal into one character per line.
+   The renderer's inline display:contents needs this explicit override. */
+:global([data-slot='sidebar.footer.action']):has(> .entry) {
+  display: flex !important;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
 /* The public footer action opens a surface without navigating the main slot. */
 .entry {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
+  flex: none;
+  white-space: nowrap;
   min-height: 36px;
   margin: 0 2px;
   padding: 7px 8px;
@@ -73,6 +85,7 @@
   text-align: left;
   cursor: pointer;
 }
+.entry > svg { flex: none; }
 .entry:hover { background: var(--p-hover); }
 
 /* showModal supplies focus containment and makes the Work tree inert. */

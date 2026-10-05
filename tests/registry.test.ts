@@ -110,3 +110,16 @@ test('stored locations are parsed defensively', () => {
   assert.deepEqual(parseLocation({ feature: 3, sections: { oops: 'chat', bad: 1 } }), { feature: null, sections: { oops: 'chat' } })
   assert.deepEqual(parseLocation({ feature: 'oops', sections: null }), { feature: 'oops', sections: {} })
 })
+
+
+test('a peer opens only an available Personal feature', () => {
+  let opened = 0
+  const registry = new PersonalRegistry(undefined, undefined, () => { opened++ })
+  registry.register(feature('oops'))
+  registry.register(feature('slides'))
+  assert.equal(registry.open('missing'), false)
+  assert.equal(opened, 0)
+  assert.equal(registry.open('slides'), true)
+  assert.equal(registry.getSelection(), 'slides')
+  assert.equal(opened, 1)
+})

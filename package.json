@@ -1,6 +1,6 @@
 {
   "name": "dsh-personal",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "private": true,
   "type": "module",
   "description": "Extensible Personal workspace entry for DeepSeek Harness",

@@ -21,7 +21,7 @@ try {
   for (const [name, bundle] of runs) {
     const source = await readFile(bundle, 'utf8')
     const html = `<!doctype html><html><meta charset="utf-8"><title>Personal switch regression fixture</title>
-<style>html,body,#root{margin:0;height:100%;font:14px system-ui}#frame{height:100%;display:grid;grid-template-columns:280px 1fr}#work-side{background:#f5f6f8;overflow:auto;padding:12px}#work-main{height:100%;display:flex;flex-direction:column;min-height:0}#history{overflow:auto;flex:1}#history p{margin:12px}#root button{font:inherit}#fixture-label{position:fixed;right:10px;bottom:8px;z-index:999;color:#666;font-size:11px}#overlay{position:absolute;inset:0;pointer-events:none}iframe{border:0;width:100%;height:100%}</style>
+<style>html,body,#root{margin:0;height:100%;font:14px system-ui}#frame{height:100%;display:grid;grid-template-columns:280px 1fr}#work-side{background:#f5f6f8;display:flex;flex-direction:column;min-height:0;padding:12px;box-sizing:border-box}#fixture-sessions{overflow:auto;flex:1}#fixture-footer{display:flex;flex:none;min-width:0}#peer-feishu{width:100%;box-sizing:border-box;padding:8px;border:0;text-align:left;background:transparent}#work-main{height:100%;display:flex;flex-direction:column;min-height:0}#history{overflow:auto;flex:1}#history p{margin:12px}#root button{font:inherit}#fixture-label{position:fixed;right:10px;bottom:8px;z-index:999;color:#666;font-size:11px}#overlay{position:absolute;inset:0;pointer-events:none}iframe{border:0;width:100%;height:100%}</style>
 <div id="root"></div><div id="fixture-label">OFFLINE FIXTURE · 100 session rows / 311 message rows</div>
 <script>${escapeScript(react)}</script><script>${escapeScript(reactDOM)}</script>
 <script>
@@ -29,7 +29,7 @@ window.__ModuleLoader__={load:({factory})=>window.plugin=factory(name=>name==='r
 </script><script>${escapeScript(source)}</script><script>
 const h=React.createElement, entries=[], effects=[], subscribers=new Set(), panelListeners=new Set();
 const metrics={sidebarMounts:0,sidebarUnmounts:0,workMounts:0,workUnmounts:0,featureMounts:0,featureUnmounts:0,iframeLoads:0,panelWrites:0,slotWrites:0};
-let version=0, snapshot={activePanelId:null}, registry, command;
+let fixtureWide=true; let version=0, snapshot={activePanelId:null}, registry, command;
 const notify=()=>{version++;subscribers.forEach(fn=>fn())};
 const selectPanel=id=>{metrics.panelWrites++;snapshot={activePanelId:id};panelListeners.forEach(fn=>fn());notify()};
 const subscribe=fn=>{subscribers.add(fn);return()=>subscribers.delete(fn)};
@@ -42,14 +42,14 @@ const ctx={effect:fn=>{const dispose=fn();if(dispose)effects.push(dispose)},
  register:(options,component)=>{const entry={options,component,id:++metrics.slotWrites};entries.push(entry);notify();return()=>{const index=entries.indexOf(entry);if(index!==-1){entries.splice(index,1);metrics.slotWrites++;notify()}}}}};
 function renderEntry(entry,props={}){return entry?h(entry.component,{key:entry.id,...entry.options.inject?.(),...props}):null}
 function seat(name){return entries.filter(e=>e.options.name===name).sort((a,b)=>(a.options.priority||0)-(b.options.priority||0))[0]}
-function OfficialSidebar(){React.useEffect(()=>{metrics.sidebarMounts++;return()=>metrics.sidebarUnmounts++},[]);return h('aside',{id:'work-side'},h('h2',null,'Work fixture'),entries.filter(e=>e.options.name==='sidebar.panellist').map(e=>h('button',{key:e.id,onClick:()=>selectPanel(e.options.id)},'个人')),Array.from({length:100},(_,i)=>h('p',{key:i},'Session '+i)),entries.filter(e=>e.options.name==='sidebar.footer.action').map(e=>renderEntry(e,{wide:true})))}
+function OfficialSidebar(){React.useEffect(()=>{metrics.sidebarMounts++;return()=>metrics.sidebarUnmounts++},[]);return h('aside',{id:'work-side'},h('h2',null,'Work fixture'),entries.filter(e=>e.options.name==='sidebar.panellist').map(e=>h('button',{key:e.id,onClick:()=>selectPanel(e.options.id)},'个人')),h('div',{id:'fixture-sessions'},Array.from({length:100},(_,i)=>h('p',{key:i},'Session '+i))),h('div',{id:'fixture-footer'},h('div',{'data-slot':'sidebar.footer.action',style:{display:'contents'}},entries.filter(e=>e.options.name==='sidebar.footer.action').map(e=>renderEntry(e,{wide:fixtureWide})),h('button',{id:'peer-feishu'},fixtureWide?'F ▸ Feishu':'F'))))}
 function Work(){React.useEffect(()=>{metrics.workMounts++;return()=>metrics.workUnmounts++},[]);return h('main',{id:'work-main'},h('h1',null,'Long conversation fixture'),h('div',{id:'history'},Array.from({length:311},(_,i)=>h('p',{key:i},'Message '+i+' ',Array.from({length:12},(_,j)=>h('span',{key:j},'word '+j+' '))))),h('textarea',{'aria-label':'Work draft',defaultValue:''}))}
 function Feature({portalContainer}){window.featureRenders=(window.featureRenders||0)+1;React.useEffect(()=>{metrics.featureMounts++;return()=>metrics.featureUnmounts++},[]);const button=h('button',{id:'portal-probe',style:{position:'absolute',right:12,bottom:12,zIndex:5},onClick:()=>window.portalClicks=(window.portalClicks||0)+1},'Feature menu');return h(React.Fragment,null,portalContainer?ReactDOM.createPortal(button,portalContainer):button,h('iframe',{title:'PPT fixture',srcDoc:${JSON.stringify('<h1>PPT editor fixture</h1><input aria-label="Slide draft"><button onclick="this.textContent=\'Page 2\'">Page 1</button>')},onLoad:()=>metrics.iframeLoads++}))}
 function App(){React.useSyncExternalStore(subscribe,()=>version);const sidebar=seat('sidebar');const main=snapshot.activePanelId?entries.find(e=>e.options.name==='main'&&e.options.key===snapshot.activePanelId):null;return h('div',{id:'frame'},sidebar?renderEntry(sidebar,{width:280,collapsed:false}):h(OfficialSidebar),main?renderEntry(main):h(Work),h('div',{id:'overlay'},entries.filter(e=>e.options.name==='shell.overlay').map(e=>renderEntry(e))))}
 plugin.apply(ctx);
 const removeFeature=registry.register({id:'slides',title:'Slides',order:1,icon:()=>null,component:Feature});
 ReactDOM.createRoot(document.getElementById('root')).render(h(App));
-window.test={metrics,get registry(){return registry},get panel(){return snapshot.activePanelId},get command(){return command},unload:()=>{effects.reverse().forEach(fn=>fn());notify()},removeFeature,readdFeature:()=>registry.register({id:'slides',title:'Slides',order:1,icon:()=>null,component:Feature})};
+window.test={metrics,setSidebar:(width)=>{fixtureWide=width>56;document.getElementById('frame').style.gridTemplateColumns=width+'px 1fr';notify()},get registry(){return registry},get panel(){return snapshot.activePanelId},get command(){return command},unload:()=>{effects.reverse().forEach(fn=>fn());notify()},removeFeature,readdFeature:()=>registry.register({id:'slides',title:'Slides',order:1,icon:()=>null,component:Feature})};
 window.settle=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
 </script></html>`
     const fixture = resolve(output, `${name}.html`)
@@ -69,6 +69,20 @@ window.settle=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimatio
       await page.getByRole('button', { name: '个人 · 切换空间', exact: true }).click()
       await page.getByRole('menuitemradio', { name: '工作', exact: true }).click()
       await page.evaluate(() => window.settle())
+    }
+    // Real RC2 slot shape with a full-width sibling reproduces the user report.
+    if (name === 'after') {
+      for (const width of [200, 280, 400, 56]) {
+        await page.evaluate(width => window.test.setSidebar(width), width)
+        const personal = page.getByRole('button', { name: '个人', exact: true })
+        const own = await personal.boundingBox(), peer = await page.locator('#peer-feishu').boundingBox()
+        assert.ok(own.height <= 38, 'Personal label remains a single line')
+        assert.ok(own.x + own.width <= width, 'Personal fits its sidebar')
+        assert.ok(peer.y >= own.y + own.height, 'Feishu keeps its own row')
+        assert.ok(peer.x + peer.width <= width, 'Peer action fits its sidebar')
+      }
+      await page.evaluate(() => window.test.setSidebar(280))
+      await page.screenshot({ path: resolve(output, 'footer-with-feishu.png') })
     }
     await enter()
     const frame = page.frameLocator('iframe')
